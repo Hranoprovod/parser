@@ -10,11 +10,11 @@ func readChannels(parser *Parser) (*NodeList, error) {
 	nodeList := NewNodeList()
 	for {
 		select {
-		case node := <-parser.nodes:
+		case node := <-parser.Nodes:
 			nodeList.push(node)
-		case breakingError := <-parser.errors:
+		case breakingError := <-parser.Errors:
 			return nil, breakingError
-		case <-parser.done:
+		case <-parser.Done:
 			return nodeList, nil
 		}
 	}

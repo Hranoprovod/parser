@@ -27,9 +27,9 @@ func NewDefaultParserOptions() *ParserOptions {
 // Parser is the parser data structure
 type Parser struct {
 	parserOptions *ParserOptions
-	nodes         chan *Node
-	errors        chan *BreakingError
-	done          chan bool
+	Nodes         chan *Node
+	Errors        chan *BreakingError
+	Done          chan bool
 }
 
 // NewParser returns new parser
@@ -45,7 +45,7 @@ func NewParser(parserOptions *ParserOptions) *Parser {
 func (p *Parser) ParseFile(fileName string) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		p.errors <- NewBreakingError(err.Error(), exitErrorOpeningFile)
+		p.Errors <- NewBreakingError(err.Error(), exitErrorOpeningFile)
 		return
 	}
 	defer f.Close()
@@ -69,7 +69,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 		//new nodes start at the beginning of the line
 		if line[0] != runeSpace && line[0] != runeTab {
 			if node != nil {
-				p.nodes <- node
+				p.Nodes <- node
 			}
 			node = NewNode(trimmedLine)
 			continue
@@ -79,7 +79,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			separator := strings.LastIndexAny(trimmedLine, "\t ")
 
 			if separator == -1 {
-				p.errors <- NewBreakingError(
+				p.Errors <- NewBreakingError(
 					fmt.Sprintf("Bad syntax on line %d, \"%s\".", lineNumber, line),
 					exitErrorBadSyntax,
 				)
@@ -91,7 +91,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			snum := mytrim(trimmedLine[separator:])
 			enum, err := strconv.ParseFloat(snum, 32)
 			if err != nil {
-				p.errors <- NewBreakingError(
+				p.Errors <- NewBreakingError(
 					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, lineNumber, line),
 					exitErrorConversion,
 				)
@@ -107,7 +107,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 	}
 	// push last node
 	if node != nil {
-		p.nodes <- node
+		p.Nodes <- node
 	}
-	p.done <- true
+	p.Done <- true
 }
