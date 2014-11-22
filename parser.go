@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	runeTab  = '\t'
-	runeSpace  = ' '
+	runeTab   = '\t'
+	runeSpace = ' '
 )
 
 // ParserOptions contains the parser related options

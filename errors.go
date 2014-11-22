@@ -10,7 +10,7 @@ type ParserErrorIO struct {
 }
 
 func NewParserErrorIO(err error, fileName string) *ParserErrorIO {
-	return &ParserErrorIO{ err, fileName}
+	return &ParserErrorIO{err, fileName}
 }
 
 // Error returns the error message
@@ -19,8 +19,8 @@ func (e *ParserErrorIO) Error() string {
 }
 
 type ParserErrorBadSyntax struct {
-	LineNumber int 
-	Line string
+	LineNumber int
+	Line       string
 }
 
 func NewParserErrorBadSyntax(lineNumber int, line string) *ParserErrorBadSyntax {
@@ -32,9 +32,9 @@ func (e *ParserErrorBadSyntax) Error() string {
 }
 
 type ParserErrorConversion struct {
-	Text string
+	Text       string
 	LineNumber int
-	Line string
+	Line       string
 }
 
 func NewParserErrorConversion(text string, lineNumber int, line string) *ParserErrorConversion {
@@ -42,6 +42,6 @@ func NewParserErrorConversion(text string, lineNumber int, line string) *ParserE
 }
 
 func (e *ParserErrorConversion) Error() string {
-	return 	fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", e.Text, e.LineNumber, e.Line)
+	return fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", e.Text, e.LineNumber, e.Line)
 
 }

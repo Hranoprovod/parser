@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-
 type NodeList map[string]*Node
 
 func NewNodeList() *NodeList {
@@ -16,7 +15,6 @@ func NewNodeList() *NodeList {
 func (db *NodeList) push(node *Node) {
 	(*db)[(*node).Header] = node
 }
-
 
 func readChannels(parser *Parser) (*NodeList, error) {
 	nodeList := NewNodeList()

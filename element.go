@@ -41,7 +41,7 @@ func (el *Elements) SumMerge(left *Elements, coef float32) {
 		if ndx, exists := (*el).Index(v.Name); exists {
 			(*el)[ndx].Val += v.Val * coef
 		} else {
-			(*el).Add(v.Name, v.Val * coef)
+			(*el).Add(v.Name, v.Val*coef)
 		}
 	}
 }
