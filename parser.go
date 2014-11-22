@@ -2,7 +2,6 @@ package parser
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -28,7 +27,7 @@ func NewDefaultParserOptions() *ParserOptions {
 type Parser struct {
 	parserOptions *ParserOptions
 	Nodes         chan *Node
-	Errors        chan *BreakingError
+	Errors        chan error
 	Done          chan bool
 }
 
@@ -37,7 +36,7 @@ func NewParser(parserOptions *ParserOptions) *Parser {
 	return &Parser{
 		parserOptions,
 		make(chan *Node),
-		make(chan *BreakingError),
+		make(chan error),
 		make(chan bool),
 	}
 }
@@ -45,7 +44,7 @@ func NewParser(parserOptions *ParserOptions) *Parser {
 func (p *Parser) ParseFile(fileName string) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		p.Errors <- NewBreakingError(err.Error(), exitErrorOpeningFile)
+		p.Errors <- NewParserErrorIO(err, fileName)
 		return
 	}
 	defer f.Close()
@@ -79,10 +78,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			separator := strings.LastIndexAny(trimmedLine, "\t ")
 
 			if separator == -1 {
-				p.Errors <- NewBreakingError(
-					fmt.Sprintf("Bad syntax on line %d, \"%s\".", lineNumber, line),
-					exitErrorBadSyntax,
-				)
+				p.Errors <- NewParserErrorBadSyntax(lineNumber, line)
 				return
 			}
 			ename := mytrim(trimmedLine[0:separator])
@@ -91,17 +87,14 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			snum := mytrim(trimmedLine[separator:])
 			enum, err := strconv.ParseFloat(snum, 32)
 			if err != nil {
-				p.Errors <- NewBreakingError(
-					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, lineNumber, line),
-					exitErrorConversion,
-				)
+				p.Errors <- NewParserErrorConversion(snum, lineNumber, line)
 				return
 			}
 
-			if ndx, exists := node.elements.index(ename); exists {
-				(*node.elements)[ndx].val += float32(enum)
+			if ndx, exists := node.Elements.Index(ename); exists {
+				(*node.Elements)[ndx].Val += float32(enum)
 			} else {
-				node.elements.add(ename, float32(enum))
+				node.Elements.Add(ename, float32(enum))
 			}
 		}
 	}

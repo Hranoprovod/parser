@@ -6,10 +6,10 @@ import (
 )
 
 func TestBreakingError(t *testing.T) {
-	Convey("Given new breaking error", t, func() {
-		err := NewBreakingError("test", 1)
+	Convey("Given new IO error", t, func() {
+		err := NewParserErrorIO(nil, "file_name")
 		Convey("Error is of the right type", func() {
-			So(err.Error(), ShouldEqual, "test")
+			So(err.FileName, ShouldEqual, "file_name")
 		})
 	})
 }

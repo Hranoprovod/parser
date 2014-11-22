@@ -6,8 +6,8 @@ import (
 
 // Element contains single element data
 type Element struct {
-	name string
-	val  float32
+	Name string
+	Val  float32
 }
 
 // Elements contains array of elements
@@ -23,25 +23,25 @@ func NewElements() *Elements {
 	return &Elements{}
 }
 
-func (el *Elements) add(name string, val float32) {
+func (el *Elements) Add(name string, val float32) {
 	*el = append(*el, NewElement(name, val))
 }
 
-func (el *Elements) index(name string) (int, bool) {
+func (el *Elements) Index(name string) (int, bool) {
 	for n, e := range *el {
-		if e.name == name {
+		if e.Name == name {
 			return n, true
 		}
 	}
 	return 0, false
 }
 
-func (el *Elements) sumMerge(left *Elements, coef float32) {
+func (el *Elements) SumMerge(left *Elements, coef float32) {
 	for _, v := range *left {
-		if ndx, exists := (*el).index(v.name); exists {
-			(*el)[ndx].val += v.val * coef
+		if ndx, exists := (*el).Index(v.Name); exists {
+			(*el)[ndx].Val += v.Val * coef
 		} else {
-			(*el).add(v.name, v.val*coef)
+			(*el).Add(v.Name, v.Val * coef)
 		}
 	}
 }
@@ -53,7 +53,7 @@ func (el Elements) Len() int {
 
 // Less compares two elements
 func (el Elements) Less(i, j int) bool {
-	return el[i].name < el[j].name
+	return el[i].Name < el[j].Name
 }
 
 // Swap swaps two elements
