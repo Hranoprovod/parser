@@ -6,17 +6,10 @@ import (
 )
 
 func TestNodeList(t *testing.T) {
-	Convey("Given NodeList", t, func() {
-		nl := NewNodeList()
-		Convey("Creates new NodeList", func() {
-			So(nl != nil, ShouldBeTrue)
-		})
-		Convey("Adding new node", func() {
-			node := NewNode("test")
-			nl.push(node)
-			Convey("Increases the number of nodes in the list", func() {
-				So(len(*nl), ShouldEqual, 1)
-			})
+	Convey("Given Node", t, func() {
+		node := NewNode("test")
+		Convey("Is not null", func() {
+			So(node, ShouldNotBeNil)
 		})
 	})
 }

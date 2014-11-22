@@ -2,7 +2,6 @@ package parser
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -10,48 +9,50 @@ import (
 )
 
 const (
-	runeTab  = '\t'
-	runeSpace  = ' '
+	runeTab   = '\t'
+	runeSpace = ' '
 )
 
-// ParserOptions contains the parser related options
-type ParserOptions struct {
+// Options contains the parser related options
+type Options struct {
 	commentChar uint8
 }
 
-// NewDefaultParserOptions returns the default set of parser options
-func NewDefaultParserOptions() *ParserOptions {
-	return &ParserOptions{'#'}
+// NewDefaultOptions returns the default set of parser options
+func NewDefaultOptions() *Options {
+	return &Options{'#'}
 }
 
 // Parser is the parser data structure
 type Parser struct {
-	parserOptions *ParserOptions
-	nodes         chan *Node
-	errors        chan *BreakingError
-	done          chan bool
+	options *Options
+	Nodes   chan *Node
+	Errors  chan error
+	Done    chan bool
 }
 
 // NewParser returns new parser
-func NewParser(parserOptions *ParserOptions) *Parser {
+func NewParser(options *Options) *Parser {
 	return &Parser{
-		parserOptions,
+		options,
 		make(chan *Node),
-		make(chan *BreakingError),
+		make(chan error),
 		make(chan bool),
 	}
 }
 
+// ParseFile parsers the contents of file
 func (p *Parser) ParseFile(fileName string) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		p.errors <- NewBreakingError(err.Error(), exitErrorOpeningFile)
+		p.Errors <- NewErrorIO(err, fileName)
 		return
 	}
 	defer f.Close()
 	p.ParseStream(f)
 }
 
+// ParseStream parses the contents of stream
 func (p *Parser) ParseStream(reader io.Reader) {
 	var node *Node
 	lineNumber := 0
@@ -62,14 +63,14 @@ func (p *Parser) ParseStream(reader io.Reader) {
 		trimmedLine := mytrim(line)
 
 		//skip empty lines and lines starting with #
-		if trimmedLine == "" || line[0] == p.parserOptions.commentChar {
+		if trimmedLine == "" || line[0] == p.options.commentChar {
 			continue
 		}
 
 		//new nodes start at the beginning of the line
 		if line[0] != runeSpace && line[0] != runeTab {
 			if node != nil {
-				p.nodes <- node
+				p.Nodes <- node
 			}
 			node = NewNode(trimmedLine)
 			continue
@@ -79,10 +80,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			separator := strings.LastIndexAny(trimmedLine, "\t ")
 
 			if separator == -1 {
-				p.errors <- NewBreakingError(
-					fmt.Sprintf("Bad syntax on line %d, \"%s\".", lineNumber, line),
-					exitErrorBadSyntax,
-				)
+				p.Errors <- NewErrorBadSyntax(lineNumber, line)
 				return
 			}
 			ename := mytrim(trimmedLine[0:separator])
@@ -91,23 +89,20 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			snum := mytrim(trimmedLine[separator:])
 			enum, err := strconv.ParseFloat(snum, 32)
 			if err != nil {
-				p.errors <- NewBreakingError(
-					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, lineNumber, line),
-					exitErrorConversion,
-				)
+				p.Errors <- NewErrorConversion(snum, lineNumber, line)
 				return
 			}
 
-			if ndx, exists := node.elements.index(ename); exists {
-				(*node.elements)[ndx].val += float32(enum)
+			if ndx, exists := node.Elements.Index(ename); exists {
+				(*node.Elements)[ndx].Val += float32(enum)
 			} else {
-				node.elements.add(ename, float32(enum))
+				node.Elements.Add(ename, float32(enum))
 			}
 		}
 	}
 	// push last node
 	if node != nil {
-		p.nodes <- node
+		p.Nodes <- node
 	}
-	p.done <- true
+	p.Done <- true
 }
