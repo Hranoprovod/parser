@@ -23,10 +23,12 @@ func NewElements() *Elements {
 	return &Elements{}
 }
 
+// Add adds new element to the element list
 func (el *Elements) Add(name string, val float32) {
 	*el = append(*el, NewElement(name, val))
 }
 
+// Index returns the element index from the list given element name
 func (el *Elements) Index(name string) (int, bool) {
 	for n, e := range *el {
 		if e.Name == name {
@@ -36,6 +38,7 @@ func (el *Elements) Index(name string) (int, bool) {
 	return 0, false
 }
 
+// SumMerge merges the elements by multilying to coed
 func (el *Elements) SumMerge(left *Elements, coef float32) {
 	for _, v := range *left {
 		if ndx, exists := (*el).Index(v.Name); exists {

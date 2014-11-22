@@ -4,44 +4,52 @@ import (
 	"fmt"
 )
 
-type ParserErrorIO struct {
+// ErrorIO raised on IO issue
+type ErrorIO struct {
 	err      error
 	FileName string
 }
 
-func NewParserErrorIO(err error, fileName string) *ParserErrorIO {
-	return &ParserErrorIO{err, fileName}
+// NewErrorIO creates new IO Error
+func NewErrorIO(err error, fileName string) *ErrorIO {
+	return &ErrorIO{err, fileName}
 }
 
 // Error returns the error message
-func (e *ParserErrorIO) Error() string {
+func (e *ErrorIO) Error() string {
 	return e.err.Error()
 }
 
-type ParserErrorBadSyntax struct {
+// ErrorBadSyntax used when the stream contains bad syntax
+type ErrorBadSyntax struct {
 	LineNumber int
 	Line       string
 }
 
-func NewParserErrorBadSyntax(lineNumber int, line string) *ParserErrorBadSyntax {
-	return &ParserErrorBadSyntax{lineNumber, line}
+// NewErrorBadSyntax creates new ErrorBadSyntax error
+func NewErrorBadSyntax(lineNumber int, line string) *ErrorBadSyntax {
+	return &ErrorBadSyntax{lineNumber, line}
 }
 
-func (e *ParserErrorBadSyntax) Error() string {
+// Error returns the error message
+func (e *ErrorBadSyntax) Error() string {
 	return fmt.Sprintf("Bad syntax on line %d, \"%s\".", e.LineNumber, e.Line)
 }
 
-type ParserErrorConversion struct {
+// ErrorConversion raised when the element value cannot be parsed as float
+type ErrorConversion struct {
 	Text       string
 	LineNumber int
 	Line       string
 }
 
-func NewParserErrorConversion(text string, lineNumber int, line string) *ParserErrorConversion {
-	return &ParserErrorConversion{text, lineNumber, line}
+// NewErrorConversion creates new ErrorConversion error
+func NewErrorConversion(text string, lineNumber int, line string) *ErrorConversion {
+	return &ErrorConversion{text, lineNumber, line}
 }
 
-func (e *ParserErrorConversion) Error() string {
+// Error returns the error message
+func (e *ErrorConversion) Error() string {
 	return fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", e.Text, e.LineNumber, e.Line)
 
 }

@@ -32,7 +32,7 @@ func readChannels(parser *Parser) (*NodeList, error) {
 
 func TestParser(t *testing.T) {
 	Convey("Given new parser", t, func() {
-		parser := NewParser(NewDefaultParserOptions())
+		parser := NewParser(NewDefaultOptions())
 		Convey("It completes successfully on empty string", func() {
 			go parser.ParseStream(strings.NewReader(""))
 			nodeList, error := readChannels(parser)
@@ -75,7 +75,7 @@ func TestParser(t *testing.T) {
 			go parser.ParseStream(strings.NewReader(file))
 			_, err := readChannels(parser)
 			So(err, ShouldNotBeNil)
-			bsError, ok := err.(*ParserErrorBadSyntax)
+			bsError, ok := err.(*ErrorBadSyntax)
 			So(ok, ShouldBeTrue)
 			So(err.Error(), ShouldEqual, "Bad syntax on line 2, \"  asdasd2\".")
 			So(bsError.LineNumber, ShouldEqual, 2)
@@ -88,7 +88,7 @@ func TestParser(t *testing.T) {
 			go parser.ParseStream(strings.NewReader(file))
 			_, err := readChannels(parser)
 			So(err, ShouldNotBeNil)
-			cErr, ok := err.(*ParserErrorConversion)
+			cErr, ok := err.(*ErrorConversion)
 			So(ok, ShouldBeTrue)
 			So(err.Error(), ShouldEqual, "Error converting \"s\" to float on line 2 \"  asdasd2 s\".")
 			So(cErr.LineNumber, ShouldEqual, 2)

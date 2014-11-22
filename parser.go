@@ -13,44 +13,46 @@ const (
 	runeSpace = ' '
 )
 
-// ParserOptions contains the parser related options
-type ParserOptions struct {
+// Options contains the parser related options
+type Options struct {
 	commentChar uint8
 }
 
-// NewDefaultParserOptions returns the default set of parser options
-func NewDefaultParserOptions() *ParserOptions {
-	return &ParserOptions{'#'}
+// NewDefaultOptions returns the default set of parser options
+func NewDefaultOptions() *Options {
+	return &Options{'#'}
 }
 
 // Parser is the parser data structure
 type Parser struct {
-	parserOptions *ParserOptions
-	Nodes         chan *Node
-	Errors        chan error
-	Done          chan bool
+	options *Options
+	Nodes   chan *Node
+	Errors  chan error
+	Done    chan bool
 }
 
 // NewParser returns new parser
-func NewParser(parserOptions *ParserOptions) *Parser {
+func NewParser(options *Options) *Parser {
 	return &Parser{
-		parserOptions,
+		options,
 		make(chan *Node),
 		make(chan error),
 		make(chan bool),
 	}
 }
 
+// ParseFile parsers the contents of file
 func (p *Parser) ParseFile(fileName string) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		p.Errors <- NewParserErrorIO(err, fileName)
+		p.Errors <- NewErrorIO(err, fileName)
 		return
 	}
 	defer f.Close()
 	p.ParseStream(f)
 }
 
+// ParseStream parses the contents of stream
 func (p *Parser) ParseStream(reader io.Reader) {
 	var node *Node
 	lineNumber := 0
@@ -61,7 +63,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 		trimmedLine := mytrim(line)
 
 		//skip empty lines and lines starting with #
-		if trimmedLine == "" || line[0] == p.parserOptions.commentChar {
+		if trimmedLine == "" || line[0] == p.options.commentChar {
 			continue
 		}
 
@@ -78,7 +80,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			separator := strings.LastIndexAny(trimmedLine, "\t ")
 
 			if separator == -1 {
-				p.Errors <- NewParserErrorBadSyntax(lineNumber, line)
+				p.Errors <- NewErrorBadSyntax(lineNumber, line)
 				return
 			}
 			ename := mytrim(trimmedLine[0:separator])
@@ -87,7 +89,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			snum := mytrim(trimmedLine[separator:])
 			enum, err := strconv.ParseFloat(snum, 32)
 			if err != nil {
-				p.Errors <- NewParserErrorConversion(snum, lineNumber, line)
+				p.Errors <- NewErrorConversion(snum, lineNumber, line)
 				return
 			}
 
