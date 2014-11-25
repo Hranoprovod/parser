@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"github.com/Hranoprovod/shared"
 	"io"
 	"os"
 	"strconv"
@@ -26,16 +27,16 @@ func NewDefaultOptions() *Options {
 // Parser is the parser data structure
 type Parser struct {
 	options *Options
-	Nodes   chan *Node
-	Errors  chan error
-	Done    chan bool
+	Nodes         chan *shared.Node
+	Errors        chan error
+	Done          chan bool
 }
 
 // NewParser returns new parser
 func NewParser(options *Options) *Parser {
 	return &Parser{
 		options,
-		make(chan *Node),
+		make(chan *shared.Node),
 		make(chan error),
 		make(chan bool),
 	}
@@ -54,7 +55,7 @@ func (p *Parser) ParseFile(fileName string) {
 
 // ParseStream parses the contents of stream
 func (p *Parser) ParseStream(reader io.Reader) {
-	var node *Node
+	var node *shared.Node
 	lineNumber := 0
 	lineScanner := bufio.NewScanner(reader)
 	for lineScanner.Scan() {
@@ -72,7 +73,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			if node != nil {
 				p.Nodes <- node
 			}
-			node = NewNode(trimmedLine)
+			node = shared.NewNode(trimmedLine)
 			continue
 		}
 

@@ -1,27 +1,18 @@
 package parser
 
 import (
+	"github.com/Hranoprovod/shared"
 	. "github.com/smartystreets/goconvey/convey"
 	"strings"
 	"testing"
 )
 
-type NodeList map[string]*Node
-
-func NewNodeList() *NodeList {
-	return &NodeList{}
-}
-
-func (db *NodeList) push(node *Node) {
-	(*db)[(*node).Header] = node
-}
-
-func readChannels(parser *Parser) (*NodeList, error) {
-	nodeList := NewNodeList()
+func readChannels(parser *Parser) (*shared.NodeList, error) {
+	nodeList := shared.NewNodeList()
 	for {
 		select {
 		case node := <-parser.Nodes:
-			nodeList.push(node)
+			nodeList.Push(node)
 		case breakingError := <-parser.Errors:
 			return nil, breakingError
 		case <-parser.Done:
