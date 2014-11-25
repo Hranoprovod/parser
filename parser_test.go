@@ -1,17 +1,18 @@
 package parser
 
 import (
+	"github.com/Hranoprovod/shared"
 	. "github.com/smartystreets/goconvey/convey"
 	"strings"
 	"testing"
 )
 
-func readChannels(parser *Parser) (*NodeList, error) {
-	nodeList := NewNodeList()
+func readChannels(parser *Parser) (*shared.NodeList, error) {
+	nodeList := shared.NewNodeList()
 	for {
 		select {
 		case node := <-parser.Nodes:
-			nodeList.push(node)
+			nodeList.Push(node)
 		case breakingError := <-parser.Errors:
 			return nil, breakingError
 		case <-parser.Done:
@@ -40,16 +41,16 @@ func TestParser(t *testing.T) {
 			So(len(*nodeList), ShouldEqual, 1)
 			So(err, ShouldBeNil)
 			node := (*nodeList)["2011/07/17"]
-			So(node.header, ShouldEqual, "2011/07/17")
-			elements := node.elements
+			So(node.Header, ShouldEqual, "2011/07/17")
+			elements := node.Elements
 			So(elements, ShouldNotBeNil)
 			So(len(*elements), ShouldEqual, 3)
-			So((*elements)[0].name, ShouldEqual, "el1")
-			So((*elements)[0].val, ShouldEqual, 1.22)
-			So((*elements)[1].name, ShouldEqual, "ел 2")
-			So((*elements)[1].val, ShouldEqual, 4.0)
-			So((*elements)[2].name, ShouldEqual, "el/3")
-			So((*elements)[2].val, ShouldEqual, 3.0)
+			So((*elements)[0].Name, ShouldEqual, "el1")
+			So((*elements)[0].Val, ShouldEqual, 1.22)
+			So((*elements)[1].Name, ShouldEqual, "ел 2")
+			So((*elements)[1].Val, ShouldEqual, 4.0)
+			So((*elements)[2].Name, ShouldEqual, "el/3")
+			So((*elements)[2].Val, ShouldEqual, 3.0)
 		})
 	})
 }

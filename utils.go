@@ -7,5 +7,3 @@ import (
 func mytrim(s string) string {
 	return strings.Trim(s, "\t \n:")
 }
-
-

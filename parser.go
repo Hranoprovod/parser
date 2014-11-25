@@ -3,6 +3,7 @@ package parser
 import (
 	"bufio"
 	"fmt"
+	"github.com/Hranoprovod/shared"
 	"io"
 	"os"
 	"strconv"
@@ -10,8 +11,8 @@ import (
 )
 
 const (
-	runeTab  = '\t'
-	runeSpace  = ' '
+	runeTab   = '\t'
+	runeSpace = ' '
 )
 
 // ParserOptions contains the parser related options
@@ -27,7 +28,7 @@ func NewDefaultParserOptions() *ParserOptions {
 // Parser is the parser data structure
 type Parser struct {
 	parserOptions *ParserOptions
-	Nodes         chan *Node
+	Nodes         chan *shared.Node
 	Errors        chan *BreakingError
 	Done          chan bool
 }
@@ -36,7 +37,7 @@ type Parser struct {
 func NewParser(parserOptions *ParserOptions) *Parser {
 	return &Parser{
 		parserOptions,
-		make(chan *Node),
+		make(chan *shared.Node),
 		make(chan *BreakingError),
 		make(chan bool),
 	}
@@ -53,7 +54,7 @@ func (p *Parser) ParseFile(fileName string) {
 }
 
 func (p *Parser) ParseStream(reader io.Reader) {
-	var node *Node
+	var node *shared.Node
 	lineNumber := 0
 	lineScanner := bufio.NewScanner(reader)
 	for lineScanner.Scan() {
@@ -71,7 +72,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 			if node != nil {
 				p.Nodes <- node
 			}
-			node = NewNode(trimmedLine)
+			node = shared.NewNode(trimmedLine)
 			continue
 		}
 
@@ -98,10 +99,10 @@ func (p *Parser) ParseStream(reader io.Reader) {
 				return
 			}
 
-			if ndx, exists := node.elements.index(ename); exists {
-				(*node.elements)[ndx].val += float32(enum)
+			if ndx, exists := node.Elements.Index(ename); exists {
+				(*node.Elements)[ndx].Val += float32(enum)
 			} else {
-				node.elements.add(ename, float32(enum))
+				node.Elements.Add(ename, float32(enum))
 			}
 		}
 	}
