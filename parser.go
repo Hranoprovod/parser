@@ -16,7 +16,7 @@ const (
 
 // Options contains the parser related options
 type Options struct {
-	// CommentChar contains the haracter used to indicate that the line is a comment
+	// CommentChar contains the character used to indicate that the line is a comment
 	CommentChar uint8
 }
 
