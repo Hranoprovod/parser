@@ -16,7 +16,8 @@ const (
 
 // Options contains the parser related options
 type Options struct {
-	commentChar uint8
+	// CommentChar contains the haracter used to indicate that the line is a comment
+	CommentChar uint8
 }
 
 // NewDefaultOptions returns the default set of parser options
@@ -64,7 +65,7 @@ func (p *Parser) ParseStream(reader io.Reader) {
 		trimmedLine := mytrim(line)
 
 		//skip empty lines and lines starting with #
-		if trimmedLine == "" || line[0] == p.options.commentChar {
+		if trimmedLine == "" || line[0] == p.options.CommentChar {
 			continue
 		}
 
