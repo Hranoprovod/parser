@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"fmt"
 	"strings"
 	"github.com/Hranoprovod/parser"
 )
@@ -23,7 +24,7 @@ func ExampleParseStream() {
 		for {
 			select {
 			case node := <-p.Nodes:
-				print(node.Header)
+				fmt.Println(node.Header)
 			case _ = <-p.Errors:
 				return
 			case <-p.Done:
@@ -31,4 +32,7 @@ func ExampleParseStream() {
 			}
 		}
 	}()
+	// Output:
+	// 2011/07/17
+	// 2011/07/18
 }
